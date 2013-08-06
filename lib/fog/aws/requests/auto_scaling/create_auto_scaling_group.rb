@@ -108,13 +108,13 @@ module Fog
           unless self.data[:launch_configurations].has_key?(launch_configuration_name)
             raise Fog::AWS::AutoScaling::ValidationError.new('Launch configuration name not found - null')
           end
-          self.data[:auto_scaling_groups][auto_scaling_group_name] = {
+          auto_scaling_group = {
             'AutoScalingGroupARN'     => Fog::AWS::Mock.arn('autoscaling', self.data[:owner_id], "autoScalingGroup:00000000-0000-0000-0000-000000000000:autoScalingGroupName/#{auto_scaling_group_name}", @region),
             'AutoScalingGroupName'    => auto_scaling_group_name,
             'AvailabilityZones'       => [*availability_zones],
             'CreatedTime'             => Time.now.utc,
             'DefaultCooldown'         => 300,
-            'DesiredCapacity'         => 0,
+            'DesiredCapacity'         => options['DesiredCapacity'],
             'EnabledMetrics'          => [],
             'HealthCheckGracePeriod'  => 0,
             'HealthCheckType'         => 'EC2',
@@ -129,6 +129,20 @@ module Fog
             'TerminationPolicies'     => ['Default'],
             'VPCZoneIdentifier'       => nil
           }.merge!(options)
+
+          auto_scaling_group['DesiredCapacity'].times do
+            server = Fog::Compute[:aws].servers.create
+            auto_scaling_group['Instances'] << {
+              :id => server.id,
+              :auto_scaling_group_name => auto_scaling_group_name,
+              :availability_zones => server.availability_zone,
+              :health_status => "HEALTHY",
+              :launch_configuration_name => launch_configuration_name,
+              :life_cycle_state => "Pending"
+            }
+          end
+
+          self.data[:auto_scaling_groups][auto_scaling_group_name] = auto_scaling_group
 
           response = Excon::Response.new
           response.status = 200

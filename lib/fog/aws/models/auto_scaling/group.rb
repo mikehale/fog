@@ -74,15 +74,23 @@ module Fog
         end
 
         def instances
-          Fog::AWS::AutoScaling::Instances.new(:service => service).load(attributes[:instances])
+          Fog::AWS::AutoScaling::Instances.new(:service => service).load(instance_data)
+        end
+
+        def instance_data
+          requires :id
+          attributes[:instances].map do |instance|
+            instance[:auto_scaling_group_name] ||= id
+            instance
+          end
         end
 
         def instances_in_service
-          attributes[:instances].select {|hash| hash['LifecycleState'] == 'InService'}.map {|hash| hash['InstanceId']}
+          instance_data.select {|hash| hash['LifecycleState'] == 'InService'}.map {|hash| hash['InstanceId']}
         end
 
         def instances_out_service
-          attributes[:instances].select {|hash| hash['LifecycleState'] == 'OutOfService'}.map {|hash| hash['InstanceId']}
+          instance_data.select {|hash| hash['LifecycleState'] == 'OutOfService'}.map {|hash| hash['InstanceId']}
         end
 
         def resume_processes(processes = [])
