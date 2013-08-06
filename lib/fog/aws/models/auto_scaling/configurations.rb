@@ -7,11 +7,6 @@ module Fog
 
         model Fog::AWS::AutoScaling::Configuration
 
-        # Creates a new launch configuration
-        def initialize(attributes={})
-          super
-        end
-
         def all
           data = []
           next_token = nil

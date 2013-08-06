@@ -44,16 +44,6 @@ module Fog
           life_cycle_state == 'InService'
         end
 
-        def reload
-          super
-          self
-        end
-
-        #def destroy
-        #  requires :id
-        #  service.delete_auto_scaling_group(id)
-        #end
-
       end
     end
   end

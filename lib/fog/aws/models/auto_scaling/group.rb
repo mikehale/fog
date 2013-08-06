@@ -53,7 +53,6 @@ module Fog
           Fog::AWS::AutoScaling::Activities.new({
             :data => data,
             :service => service,
-            #:load_balancer => self
           })
         end
 
@@ -114,11 +113,6 @@ module Fog
           service.create_auto_scaling_group(id, availability_zones, launch_configuration_name, max_size, min_size, filtered_options(:create_auto_scaling_group))
           reload
         end
-
-        #def reload
-        #  super
-        #  self
-        #end
 
         def destroy(options = { :force => false })
           requires :id

@@ -7,11 +7,6 @@ module Fog
 
         model Fog::AWS::AutoScaling::Group
 
-        # Creates a new auto scaling group.
-        def initialize(attributes={})
-          super
-        end
-
         def all
           data = []
           next_token = nil
